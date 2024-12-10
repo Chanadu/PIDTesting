@@ -4,42 +4,114 @@ void disabled() {}
 void competition_initialize() {}
 void autonomous() {}
 
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
+const float drivetrainWheelSize = 2.75;
+const float distanceToTravelInches = 48;
+const float errorRange = 0.5;
 
+pros::Controller controller(pros::E_CONTROLLER_MASTER);
 pros::MotorGroup leftMotorGroup({1, -2, 3}, pros::MotorGears::blue);
 pros::MotorGroup rightMotorGroup({-4, 5, -8}, pros::MotorGears::blue);
 pros::Imu imu(11);
 
-void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::MotorGroup left_mg({1, -2, 3});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({-4, 5, -6});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
+struct PID {
+	double kP, kI, kD;
+	double target;
+	double previousError = 0;
+	double integral = 0;
+	double antiWindup = 3;
+};
 
+double getAveragePosition() {
+	std::vector<double> leftPositions = leftMotorGroup.get_position_all();
+	std::vector<double> rightPositions = rightMotorGroup.get_position_all();
+	double averagePosition = 0;
+	for (int i = 0; i < leftPositions.size(); i++) {
+		averagePosition += leftPositions[i] + rightPositions[i];
+	}
+	averagePosition /= leftPositions.size() * 2;
+	return averagePosition;
+}
+
+double updateDrivePID(PID* pid) {
+	// Calculate error
+	double error = getAveragePosition() - pid->target;
+
+	// Calculate proportional term
+	double proportional = pid->kP * error;
+
+	// Calculate integral term
+	pid->integral += pid->kI * error;
+
+	// Calculate derivative term
+	double derivative = pid->kD * (error - pid->previousError);
+
+	// Calculate PID output
+	double output = proportional + pid->integral + derivative;
+
+	// Update previous error
+	pid->previousError = error;
+
+	return output;
+}
+
+double updateTurnPID(PID* pid) {
+	double angle = imu.get_heading();
+	double error = pid->target - angle;
+
+	// Calculate proportional term
+	double proportional = pid->kP * error;
+
+	// Calculate integral term
+	pid->integral += pid->kI * error;
+
+	// Calculate derivative term
+	double derivative = pid->kD * (error - pid->previousError);
+
+	// Calculate PID output
+	double output = proportional + pid->integral + derivative;
+
+	// Update previous error
+	pid->previousError = error;
+
+	return output;
+}
+
+void opcontrol() {
+	leftMotorGroup.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+	rightMotorGroup.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+
+	imu.reset();
+	leftMotorGroup.tare_position();
+	rightMotorGroup.tare_position();
+
+	// Kp, Ki, Kd, target
+	PID drivePID = {0.1, 0.1, 0.1, 360 * (distanceToTravelInches / drivetrainWheelSize)};
+	PID turnPID = {0.1, 0.1, 0.1, 0};
 
 	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
+		pros::lcd::print(0, "Started");
+		double drive, turn;
 
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
-		pros::delay(20);                               // Run for 20 ms then update
+		if (getAveragePosition() <= drivePID.target + errorRange &&
+			getAveragePosition() >= drivePID.target - errorRange) {
+			leftMotorGroup.move_voltage(0);
+			rightMotorGroup.move_voltage(0);
+		} else {
+			double drive = updateDrivePID(&drivePID);
+			double turn = updateTurnPID(&turnPID);
+		}
+
+		pros::lcd::print(1, "Position: %f", getAveragePosition());
+		pros::lcd::print(2, "D: %f, T: %f", drive, turn);
+
+		// Drive
+		leftMotorGroup.move_voltage(drive + turn);
+		rightMotorGroup.move_voltage(drive - turn);
+
+		pros::delay(20);
 	}
 }
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
 }
