@@ -7,6 +7,7 @@ void autonomous() {}
 const float drivetrainWheelSize = 2.75;
 const float distanceToTravelInches = 48;
 const float errorRange = 0.5;
+const float movementSpeed = 0.5;
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 pros::MotorGroup leftMotorGroup({1, -2, 3}, pros::MotorGears::blue);
@@ -73,7 +74,7 @@ double updateTurnPID(PID* pid) {
 	// Update previous error
 	pid->previousError = error;
 
-	return output;
+	return std::clamp(output, -1.0, 1.0);
 }
 
 void opcontrol() {
@@ -90,15 +91,14 @@ void opcontrol() {
 
 	while (true) {
 		pros::lcd::print(0, "Started");
-		double drive, turn;
+
+		double drive = updateDrivePID(&drivePID) * 12000 * movementSpeed;
+		double turn = updateTurnPID(&turnPID) * 12000 * movementSpeed;
 
 		if (getAveragePosition() <= drivePID.target + errorRange &&
 			getAveragePosition() >= drivePID.target - errorRange) {
-			leftMotorGroup.move_voltage(0);
-			rightMotorGroup.move_voltage(0);
-		} else {
-			double drive = updateDrivePID(&drivePID);
-			double turn = updateTurnPID(&turnPID);
+			drive = 0;
+			turn = 0;
 		}
 
 		pros::lcd::print(1, "Position: %f", getAveragePosition());
