@@ -10,7 +10,7 @@ const float errorRange = 0.5;
 const float movementSpeed = 0.5;
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
-pros::MotorGroup leftMotorGroup({1, -2, 3}, pros::MotorGears::blue);
+pros::MotorGroup leftMotorGroup({1, -12, 3}, pros::MotorGears::blue);
 pros::MotorGroup rightMotorGroup({-4, 5, -8}, pros::MotorGears::blue);
 pros::Imu imu(11);
 
