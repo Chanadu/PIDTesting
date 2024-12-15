@@ -64,16 +64,15 @@ lemlib::Chassis chassis(				//
 void initializeDevices() {
 	pros::lcd::initialize();
 	// pros::screen::set_pen(pros::Color::white);
-	Devices::chassis.calibrate();  // Set
-	Devices::leftMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	Devices::rightMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	Devices::chassis.calibrate();
+	Devices::leftMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	Devices::rightMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	Devices::intakeMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	Config::controllerStrings[0] =
 		fmt::format("Battery: {:>3}%", static_cast<int>(pros::battery::get_capacity()));
 	Config::controllerStrings[1] = "";
 	Config::controllerStrings[2] = "";
-
-	Devices::intakeMotorGroup.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	// Config::controllerStrings[2] =
 	// 	"DV MV: " + Config::drivetrainMovementToAbbr.at(Config::drivetrainMovement);

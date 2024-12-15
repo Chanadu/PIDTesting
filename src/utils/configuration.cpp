@@ -24,9 +24,9 @@ float lateralCurveGain = 1.019;
 float angularCurveGain = 1.019;
 
 // lateral PID controller
-lemlib::ControllerSettings lateralMovementController(10,   // ProportionalGain
+lemlib::ControllerSettings lateralMovementController(0.1,  // ProportionalGain
 													 0,	   // IntegralGain
-													 3,	   // DerivativeGain
+													 0,	   // DerivativeGain
 													 3,	   // AntiWindup
 													 1,	   // SmallErrorRange
 													 100,  // SmallErrorRangeTimeout
@@ -46,15 +46,15 @@ lemlib::ControllerSettings lateralMovementController(10,   // ProportionalGain
 // 													 500,  // LargeErrorRangeTimeout
 // 													 0	   // MaximumAcceleration
 // );
-lemlib::ControllerSettings angularMovementController(2,	   // ProportionalGain
+lemlib::ControllerSettings angularMovementController(0.1,  // ProportionalGain
 													 0,	   // IntegralGain
 													 0,	   // DerivativeGain
-													 0,	   // AntiWindup
+													 3,	   // AntiWindup
 													 1,	   // SmallErrorRange
 													 100,  // SmallErrorRangeTimeout
 													 3,	   // LargeErrorRange
 													 500,  // LargeErrorRangeTimeout
-													 0	   // MaximumAcceleration
+													 20	   // MaximumAcceleration
 );
 
 DrivetrainMovement drivetrainMovement = DrivetrainMovement::DoubleStickArcade;
