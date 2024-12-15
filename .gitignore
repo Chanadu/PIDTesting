@@ -10,8 +10,11 @@
 bin/
 .vscode/
 .cache/
-#compile_commands.json
+compile_commands.json
 temp.log
 temp.errors
-*.ini
+*.i
+ni
 .d/
+.ccls-cache
+.idea
