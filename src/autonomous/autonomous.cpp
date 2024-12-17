@@ -48,8 +48,9 @@ void autonomousRunner() {
 	short lineNumber = 5;
 
 	pros::lcd::print(lineNumber++, "AUTON RUNNING %s", autonTypeString.at(autonType));
-	// Config::controllerStrings[1] = fmt::format("Running Auton");
-	// Config::controllerStrings[2] = fmt::format("AUTON {}", autonTypeString.at(autonType));
+
+	Config::controllerStrings[1] = fmt::format("Running Auton");
+	Config::controllerStrings[2] = fmt::format("AUTON {}", autonTypeString.at(autonType));
 
 	runAuton(autonType);
 }
