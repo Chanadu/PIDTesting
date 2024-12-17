@@ -4,6 +4,8 @@
 #include "main.h"
 
 namespace Config {
+enum class PIDTypes;
+
 extern const float drivetrainTrackWidth;
 extern const float drivetrainWheelbaseWidth;
 extern const float drivetrainWheelRPM;
@@ -27,12 +29,27 @@ extern float angularCurveGain;
 extern lemlib::ControllerSettings lateralMovementController;
 extern lemlib::ControllerSettings angularMovementController;
 
+extern float angularKu;
+extern float angularTuSeconds;
+
+extern float lateralKu;
+extern float lateralTuSeconds;
+
+extern PIDTypes currentlyUsingPIDType;
+
 enum class DrivetrainMovement {
 	Tank,
 	SingleStickArcade,
 	DoubleStickArcade,
 	SingleStickCurvature,
 	DoubleStickCurvature
+};
+
+enum class PIDTypes {
+	P,
+	PI,
+	PD,
+	PID,
 };
 
 inline const std::vector drivetrainMovements{
@@ -43,17 +60,11 @@ inline const std::vector drivetrainMovements{
 	DrivetrainMovement::DoubleStickCurvature,
 };
 
-inline const std::unordered_map<DrivetrainMovement, std::string> drivetrainMovementToAbbr{
-	{DrivetrainMovement::Tank, "TAN"},
-	{DrivetrainMovement::SingleStickArcade, "SSA"},
-	{DrivetrainMovement::DoubleStickArcade, "DSA"},
-	{DrivetrainMovement::SingleStickCurvature, "SSC"},
-	{DrivetrainMovement::DoubleStickCurvature, "DSC"},
-};
-
 extern DrivetrainMovement drivetrainMovement;
 extern std::string controllerStrings[3];
 extern std::string controllerRumblePattern;
+
+lemlib::ControllerSettings createControllerSettings(PIDTypes pidType, double Ku, double Tu);
 }  // namespace Config
 
 #endif	// CONFIGURATION_HPP

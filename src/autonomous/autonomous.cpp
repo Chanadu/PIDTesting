@@ -11,6 +11,7 @@ void tuneAngularPID() {
 
 void tuneLateralPID() {
 	Devices::chassis.moveToPoint(48, 0, 100000);
+	// Devices::chassis.moveToPoint(0, 48, 100000);
 }
 
 void runAuton(const AutonTypes autonType) {
@@ -31,17 +32,24 @@ void runAuton(const AutonTypes autonType) {
 }
 
 void autonomousRunner() {
-	clearScreen();
+	pros::Task task{[=] {
+		clearScreen();
+
+		short lineNumber = 0;
+		batteryDisplay(lineNumber);
+		chassisPositionDisplay(lineNumber);
+		drivetrainPositionDisplay(lineNumber);
+		drivetrainVelocityDisplay(lineNumber);
+		pros::delay(50);
+	}};
 
 	constexpr AutonTypes autonType = TL;
 
-	short lineNumber = 0;
+	short lineNumber = 5;
 
 	pros::lcd::print(lineNumber++, "AUTON RUNNING %s", autonTypeString.at(autonType));
-	Config::controllerStrings[1] = fmt::format("AUTON {}", autonTypeString.at(autonType));
-
-	batteryDisplay(lineNumber);
-	chassisPositionDisplay(lineNumber);
+	// Config::controllerStrings[1] = fmt::format("Running Auton");
+	// Config::controllerStrings[2] = fmt::format("AUTON {}", autonTypeString.at(autonType));
 
 	runAuton(autonType);
 }

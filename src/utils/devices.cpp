@@ -51,13 +51,19 @@ lemlib::ExpoDriveCurve turnCurve(													  //
 );
 
 // create the chassis
-lemlib::Chassis chassis(				//
-	drivetrain,							// drivetrain settings
-	Config::lateralMovementController,	// lateral PID settings
-	Config::angularMovementController,	// angular PID settings
-	odomSensors,						// odometry sensors
-	&driveCurve,						// throttle curve
-	&turnCurve							// steering curve
+lemlib::Chassis chassis(  //
+	drivetrain,			  // drivetrain settings
+	// Config::lateralMovementController,	// lateral PID settings
+	// Config::angularMovementController,	// angular PID settings
+	createControllerSettings(Config::currentlyUsingPIDType,
+							 Config::lateralKu,
+							 Config::lateralTuSeconds),	 // lateral PID settings
+	createControllerSettings(Config::currentlyUsingPIDType,
+							 Config::angularKu,
+							 Config::angularTuSeconds),	 // angular PID settings
+	odomSensors,										 // odometry sensors
+	&driveCurve,										 // throttle curve
+	&turnCurve											 // steering curve
 );
 
 }  // namespace Devices

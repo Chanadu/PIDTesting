@@ -20,10 +20,30 @@ void chassisPositionDisplay(short& lineNumber) {
 
 void drivetrainTorqueDisplay(short& lineNumber) {
 	pros::lcd::print(
-		lineNumber++, "L: %4.2f %4.2f %4.2f R: %4.2f %4.2f %4.2f",
+		lineNumber++, "T: L: %4.2f %4.2f %4.2f R: %4.2f %4.2f %4.2f",
 		Devices::leftMotorGroup.get_torque_all()[0], Devices::leftMotorGroup.get_torque_all()[1],
 		Devices::leftMotorGroup.get_torque_all()[2], Devices::rightMotorGroup.get_torque_all()[0],
 		Devices::rightMotorGroup.get_torque_all()[1], Devices::rightMotorGroup.get_torque_all()[2]);
+}
+
+void drivetrainVelocityDisplay(short& lineNumber) {
+	pros::lcd::print(lineNumber++, "V: L: %4.2f %4.2f %4.2f R: %4.2f %4.2f %4.2f",
+					 Devices::leftMotorGroup.get_target_velocity_all()[0],
+					 Devices::leftMotorGroup.get_target_velocity_all()[1],
+					 Devices::leftMotorGroup.get_target_velocity_all()[2],
+					 Devices::rightMotorGroup.get_target_velocity_all()[0],
+					 Devices::rightMotorGroup.get_target_velocity_all()[1],
+					 Devices::rightMotorGroup.get_target_velocity_all()[2]);
+}
+
+void drivetrainPositionDisplay(short& lineNumber) {
+	pros::lcd::print(lineNumber++, "V: L: %4.2f %4.2f %4.2f R: %4.2f %4.2f %4.2f",
+					 Devices::leftMotorGroup.get_target_position_all()[0],
+					 Devices::leftMotorGroup.get_target_position_all()[1],
+					 Devices::leftMotorGroup.get_target_position_all()[2],
+					 Devices::rightMotorGroup.get_target_position_all()[0],
+					 Devices::rightMotorGroup.get_target_position_all()[1],
+					 Devices::rightMotorGroup.get_target_position_all()[2]);
 }
 
 void clearScreen() {

@@ -12,6 +12,9 @@ void opcontrolRunner() {
 		short lineNumber = 0;
 		batteryDisplay(lineNumber);
 		chassisPositionDisplay(lineNumber);
+
+		drivetrainPositionDisplay(lineNumber);
+		drivetrainVelocityDisplay(lineNumber);
 		drivetrainTorqueDisplay(lineNumber);
 
 		drivetrainMovementController();
